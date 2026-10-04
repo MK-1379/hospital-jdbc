@@ -1,4 +1,6 @@
 package org.mk13.util;
+import org.mk13.exception.DataAccessException;
+
 import java.sql.*;
 import java.io.IOException;
 import java.io.InputStream;
@@ -21,7 +23,7 @@ public class DatabaseConnection {
                     props.getProperty("db.password"));
         }
         catch (IOException | SQLException e) {
-            e.printStackTrace();
+            throw new DataAccessException("No se pudo conectar con la base de datos", e);
         }
         return con;
     }
