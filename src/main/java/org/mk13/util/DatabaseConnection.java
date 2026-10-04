@@ -7,7 +7,7 @@ import java.io.InputStream;
 import java.util.Properties;
 
 public class DatabaseConnection {
-    private static Connection con = null;
+
     public static Connection getConnection()
     {
         Properties props = new Properties();
@@ -17,7 +17,7 @@ public class DatabaseConnection {
                         "No se encuentra db.properties. Copia db.properties.example y rellénalo.");
             }
             props.load(in);
-            con = DriverManager.getConnection(
+            return DriverManager.getConnection(
                     props.getProperty("db.url"),
                     props.getProperty("db.user"),
                     props.getProperty("db.password"));
@@ -25,7 +25,6 @@ public class DatabaseConnection {
         catch (IOException | SQLException e) {
             throw new DataAccessException("No se pudo conectar con la base de datos", e);
         }
-        return con;
     }
 
 }
