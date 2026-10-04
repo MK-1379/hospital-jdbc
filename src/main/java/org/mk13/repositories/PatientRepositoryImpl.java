@@ -13,8 +13,10 @@ public class PatientRepositoryImpl implements PatientRepository {
     @Override
     public Patient getPatient(int id) {
         Patient patient = patientDao.getPatient(id);
-        Doctor doctor = doctorDao.getDoctorByPatientId(patient.getId());
-        patient.setDoctor(doctor);
+        if (patient == null) {
+            return null;
+        }
+        patient.setDoctor(doctorDao.getDoctorByPatientId(patient.getId()));
         return patient;
     }
 
