@@ -1,0 +1,3 @@
+   db.url=jdbc:mysql://localhost:3306/poo_hospital
+   db.user=hospital_app
+   db.password=cambia_esta_contraseña
