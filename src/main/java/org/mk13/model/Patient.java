@@ -20,14 +20,7 @@ public class Patient {
         this.disease = disease;
     }
 
-    public Patient(){
-        age = 32;
-        phone = "610442323";
-        name = "Carlos";
-        lastname = "Gonzalez";
-        id = 1;
-        dni = "18543256H";
-        disease = "Headache";
+    public Patient() {
     }
 
     public int getAge() {

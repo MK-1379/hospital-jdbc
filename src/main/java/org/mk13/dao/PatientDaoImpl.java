@@ -3,18 +3,27 @@ package org.mk13.dao;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import javax.sql.DataSource;
 
 import org.mk13.exception.DataAccessException;
 import org.mk13.idao.PatientDao;
 import org.mk13.model.Patient;
-import org.mk13.util.DatabaseConnection;
 
 public class PatientDaoImpl implements PatientDao {
 
+    private final DataSource dataSource;
+
+    public PatientDaoImpl(DataSource dataSource) {
+        this.dataSource = dataSource;
+    }
+
     @Override
     public boolean add(Patient pat) {
+        if (pat.getDoctor() == null) {
+            throw new IllegalArgumentException("El paciente debe tener un doctor asignado");
+        }
         String query = "INSERT INTO patient(name, lastname, dni, age, phone, disease, doctor_id) VALUES (?, ?, ?, ?, ?, ?, ?)";
-        try (Connection con = DatabaseConnection.getConnection();
+        try (Connection con = dataSource.getConnection();
              PreparedStatement ps = con.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
             ps.setString(1, pat.getName());
             ps.setString(2, pat.getLastname());
@@ -41,7 +50,7 @@ public class PatientDaoImpl implements PatientDao {
     @Override
     public boolean delete(int id) {
         String query = "DELETE FROM patient WHERE id=?";
-        try (Connection con = DatabaseConnection.getConnection();
+        try (Connection con = dataSource.getConnection();
              PreparedStatement ps = con.prepareStatement(query)) {
             ps.setInt(1, id);
             return ps.executeUpdate() > 0;
@@ -53,7 +62,7 @@ public class PatientDaoImpl implements PatientDao {
     @Override
     public Patient getPatient(int id) {
         String query = "SELECT * FROM patient WHERE id = ?";
-        try (Connection con = DatabaseConnection.getConnection();
+        try (Connection con = dataSource.getConnection();
              PreparedStatement ps = con.prepareStatement(query)) {
             ps.setInt(1, id);
             try (ResultSet rs = ps.executeQuery()) {
@@ -68,7 +77,7 @@ public class PatientDaoImpl implements PatientDao {
     public List<Patient> getPatients() {
         List<Patient> patients = new ArrayList<>();
         String query = "SELECT * FROM patient";
-        try (Connection con = DatabaseConnection.getConnection();
+        try (Connection con = dataSource.getConnection();
              PreparedStatement ps = con.prepareStatement(query);
              ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
@@ -83,7 +92,7 @@ public class PatientDaoImpl implements PatientDao {
     @Override
     public boolean update(Patient pat) {
         String query = "UPDATE patient SET name=?, lastname=?, dni=?, phone=?, age=?, disease=? WHERE id=?";
-        try (Connection con = DatabaseConnection.getConnection();
+        try (Connection con = dataSource.getConnection();
              PreparedStatement ps = con.prepareStatement(query)) {
             ps.setString(1, pat.getName());
             ps.setString(2, pat.getLastname());

@@ -1,32 +1,33 @@
-
 package org.mk13;
 
-import org.mk13.util.DatabaseConnection;
+import java.math.BigDecimal;
+import java.util.List;
+import javax.sql.DataSource;
 
-import java.sql.Connection;
 import org.mk13.dao.DoctorDaoImpl;
 import org.mk13.dao.PatientDaoImpl;
 import org.mk13.model.Doctor;
 import org.mk13.model.Patient;
 import org.mk13.repositories.PatientRepository;
 import org.mk13.repositories.PatientRepositoryImpl;
-
-import java.util.List;
+import org.mk13.util.DatabaseConnection;
 
 public class App {
 
     public static void main(String[] args) {
 
-        DoctorDaoImpl doctorDao = new DoctorDaoImpl();
-        PatientDaoImpl patientDao = new PatientDaoImpl();
-        PatientRepository repo = new PatientRepositoryImpl();
+        // Se crean las dependencias aquí y se pasan por el constructor.
+        DataSource dataSource = DatabaseConnection.createDataSource();
+        DoctorDaoImpl doctorDao = new DoctorDaoImpl(dataSource);
+        PatientDaoImpl patientDao = new PatientDaoImpl(dataSource);
+        PatientRepository repo = new PatientRepositoryImpl(patientDao, doctorDao);
 
         // Insertar doctor
         Doctor doc = new Doctor();
         doc.setName("Juan");
         doc.setLastname("Pérez");
         doc.setDni("12345678A");
-        doc.setSalary(3500);
+        doc.setSalary(new BigDecimal("3500.00"));
         doc.setSpeciality("Cardiology");
 
         doctorDao.add(doc);
@@ -40,7 +41,7 @@ public class App {
 
 
         // Actualizar doctor
-        doctor.setSalary(4000);
+        doctor.setSalary(new BigDecimal("4000.00"));
         doctorDao.update(doctor);
 
         System.out.println("Doctor actualizado:");

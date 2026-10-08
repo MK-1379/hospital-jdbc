@@ -1,14 +1,17 @@
 package org.mk13.model;
 
+import java.math.BigDecimal;
+
 public class Doctor {
     private int id;
     private String name;
     private String lastname;
     private String dni;
-    private double salary;
+    // BigDecimal y no double: el dinero necesita decimales exactos.
+    private BigDecimal salary;
     private String speciality;
 
-    public Doctor(String dni, int id, String lastname, String name, double salary, String speciality) {
+    public Doctor(String dni, int id, String lastname, String name, BigDecimal salary, String speciality) {
         this.dni = dni;
         this.id = id;
         this.lastname = lastname;
@@ -17,13 +20,7 @@ public class Doctor {
         this.speciality = speciality;
     }
 
-    public Doctor(){
-        id = 1;
-        name = "Pedro";
-        lastname = "Perez";
-        dni = "12345678G";
-        salary = 3000.50;
-        speciality = "Pediatry";
+    public Doctor() {
     }
 
     public String getDni() {
@@ -58,11 +55,11 @@ public class Doctor {
         this.name = name;
     }
 
-    public double getSalary() {
+    public BigDecimal getSalary() {
         return salary;
     }
 
-    public void setSalary(double salary) {
+    public void setSalary(BigDecimal salary) {
         this.salary = salary;
     }
 

@@ -11,6 +11,9 @@ The goal of the project is to practise a layered data-access design (model, DAO,
 - Parameterised queries (`PreparedStatement`) everywhere, so no SQL injection
 - Database credentials read from a configuration file, not from the code
 - Database errors surface as a single `DataAccessException` that keeps the original cause
+- Salaries stored as `DECIMAL(10,2)` and handled as `BigDecimal`, so money keeps exact decimals
+- DAOs receive their `DataSource` through the constructor (dependency injection), which makes them easy to test
+- Automated tests with JUnit 5 against an in-memory H2 database
 
 ## Tech stack
 
@@ -18,6 +21,7 @@ The goal of the project is to practise a layered data-access design (model, DAO,
 - Maven
 - MySQL 8 and the MySQL Connector/J driver
 - JDBC
+- JUnit 5 and H2 (tests)
 
 ## Requirements
 
@@ -53,9 +57,38 @@ The goal of the project is to practise a layered data-access design (model, DAO,
 
 `App` inserts, reads, updates and deletes a sample doctor and a sample patient and prints each step.
 
+## Running the tests
+
+```bash
+mvn test
+```
+
+The tests do not need MySQL. Each test creates its own empty H2 database in memory (in MySQL compatibility mode) from [`src/test/resources/schema.sql`](src/test/resources/schema.sql), so tests never share data and can run in any order.
+
+They cover:
+
+- `DoctorDaoImplTest`: CRUD, missing ids, `BigDecimal` salaries, and that a doctor with patients cannot be deleted (foreign key).
+- `PatientDaoImplTest`: CRUD, a patient without a doctor, and a patient pointing to a doctor that does not exist.
+- `PatientRepositoryImplTest`: loading a patient together with its doctor.
+
 ## Project structure
 
 ```
 database/                    SQL script (schema and sample data)
 src/main/java/org/mk13/
-  model/                     Doctor
+  model/                     Doctor and Patient
+  idao/                      DAO interfaces
+  dao/                       JDBC implementations of the DAOs
+  repositories/              PatientRepository (patient + doctor)
+  exception/                 DataAccessException
+  util/                      DatabaseConnection (builds the DataSource from db.properties)
+  App.java                   Demo of every operation
+src/main/resources/          db.properties.example
+src/test/java/org/mk13/      JUnit 5 tests and the H2 test database helper
+src/test/resources/          schema.sql for the tests
+```
+
+## Design notes
+
+- **Dependency injection without a framework.** `App` builds the `DataSource` once and passes it to the DAOs, and the DAOs to the repository. Production code uses MySQL; the tests pass an H2 `DataSource` instead, without changing a single line of the DAOs.
+- **One connection per operation.** Each DAO method opens a connection, runs one statement and closes everything with try-with-resources.

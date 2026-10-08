@@ -12,7 +12,7 @@ CREATE TABLE doctor (
                         name       VARCHAR(60) NOT NULL,
                         lastname   VARCHAR(60) NOT NULL,
                         dni        VARCHAR(10) NOT NULL,
-                        salary     DOUBLE      NOT NULL,
+                        salary     DECIMAL(10,2) NOT NULL,
                         speciality VARCHAR(60) NOT NULL,
                         PRIMARY KEY (id)
 ) ENGINE=InnoDB;

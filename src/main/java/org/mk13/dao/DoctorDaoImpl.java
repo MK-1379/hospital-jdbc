@@ -3,18 +3,24 @@ package org.mk13.dao;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import javax.sql.DataSource;
 
 import org.mk13.exception.DataAccessException;
 import org.mk13.idao.DoctorDao;
 import org.mk13.model.Doctor;
-import org.mk13.util.DatabaseConnection;
 
 public class DoctorDaoImpl implements DoctorDao {
+
+    private final DataSource dataSource;
+
+    public DoctorDaoImpl(DataSource dataSource) {
+        this.dataSource = dataSource;
+    }
 
     @Override
     public Doctor getDoctor(int id) {
         String query = "SELECT * FROM doctor WHERE id = ?";
-        try (Connection con = DatabaseConnection.getConnection();
+        try (Connection con = dataSource.getConnection();
              PreparedStatement ps = con.prepareStatement(query)) {
             ps.setInt(1, id);
             try (ResultSet rs = ps.executeQuery()) {
@@ -28,12 +34,12 @@ public class DoctorDaoImpl implements DoctorDao {
     @Override
     public boolean add(Doctor doc) {
         String query = "INSERT INTO doctor (name, lastname, dni, salary, speciality) VALUES (?, ?, ?, ?, ?)";
-        try (Connection con = DatabaseConnection.getConnection();
+        try (Connection con = dataSource.getConnection();
              PreparedStatement ps = con.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
             ps.setString(1, doc.getName());
             ps.setString(2, doc.getLastname());
             ps.setString(3, doc.getDni());
-            ps.setDouble(4, doc.getSalary());
+            ps.setBigDecimal(4, doc.getSalary());
             ps.setString(5, doc.getSpeciality());
             int rows = ps.executeUpdate();
             if (rows > 0) {
@@ -53,7 +59,7 @@ public class DoctorDaoImpl implements DoctorDao {
     @Override
     public boolean delete(int id) {
         String query = "DELETE FROM doctor WHERE id=?";
-        try (Connection con = DatabaseConnection.getConnection();
+        try (Connection con = dataSource.getConnection();
              PreparedStatement ps = con.prepareStatement(query)) {
             ps.setInt(1, id);
             return ps.executeUpdate() > 0;
@@ -66,7 +72,7 @@ public class DoctorDaoImpl implements DoctorDao {
     public List<Doctor> getDoctors() {
         List<Doctor> doctors = new ArrayList<>();
         String query = "SELECT * FROM doctor";
-        try (Connection con = DatabaseConnection.getConnection();
+        try (Connection con = dataSource.getConnection();
              PreparedStatement ps = con.prepareStatement(query);
              ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
@@ -81,12 +87,12 @@ public class DoctorDaoImpl implements DoctorDao {
     @Override
     public boolean update(Doctor doc) {
         String query = "UPDATE doctor SET name=?, lastname=?, dni=?, salary=?, speciality=? WHERE id=?";
-        try (Connection con = DatabaseConnection.getConnection();
+        try (Connection con = dataSource.getConnection();
              PreparedStatement ps = con.prepareStatement(query)) {
             ps.setString(1, doc.getName());
             ps.setString(2, doc.getLastname());
             ps.setString(3, doc.getDni());
-            ps.setDouble(4, doc.getSalary());
+            ps.setBigDecimal(4, doc.getSalary());
             ps.setString(5, doc.getSpeciality());
             ps.setInt(6, doc.getId());
             return ps.executeUpdate() > 0;
@@ -98,7 +104,7 @@ public class DoctorDaoImpl implements DoctorDao {
     @Override
     public Doctor getDoctorByPatientId(int patientId) {
         String query = "SELECT d.* FROM doctor d INNER JOIN patient p ON d.id = p.doctor_id WHERE p.id = ?";
-        try (Connection con = DatabaseConnection.getConnection();
+        try (Connection con = dataSource.getConnection();
              PreparedStatement ps = con.prepareStatement(query)) {
             ps.setInt(1, patientId);
             try (ResultSet rs = ps.executeQuery()) {
@@ -115,7 +121,7 @@ public class DoctorDaoImpl implements DoctorDao {
         doctor.setName(rs.getString("name"));
         doctor.setLastname(rs.getString("lastname"));
         doctor.setDni(rs.getString("dni"));
-        doctor.setSalary(rs.getDouble("salary"));
+        doctor.setSalary(rs.getBigDecimal("salary"));
         doctor.setSpeciality(rs.getString("speciality"));
         return doctor;
     }
