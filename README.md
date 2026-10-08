@@ -26,7 +26,7 @@ The goal of the project is to practise a layered data-access design (model, DAO,
 ## Requirements
 
 - JDK 21
-- Maven 3.9 or later (or an IDE with Maven support, such as IntelliJ IDEA)
+- Maven is optional: the project includes the Maven Wrapper (`mvnw`). An IDE with Maven support, such as IntelliJ IDEA, also works.
 - A running MySQL 8 server
 
 ## Getting started
@@ -52,7 +52,7 @@ The goal of the project is to practise a layered data-access design (model, DAO,
 5. **Run it.** From your IDE, run `org.mk13.App`. From the command line:
 
 ```bash
-   mvn compile exec:java -Dexec.mainClass="org.mk13.App"
+   ./mvnw compile exec:java -Dexec.mainClass="org.mk13.App"
 ```
 
 `App` inserts, reads, updates and deletes a sample doctor and a sample patient and prints each step.
@@ -60,8 +60,11 @@ The goal of the project is to practise a layered data-access design (model, DAO,
 ## Running the tests
 
 ```bash
-mvn test
+./mvnw test        # Linux / macOS / Git Bash
+.\mvnw.cmd test    # Windows (PowerShell or CMD)
 ```
+
+You do not need Maven installed: the Maven Wrapper (`mvnw`) downloads the right version the first time. You only need a JDK 21 with `JAVA_HOME` set. In IntelliJ IDEA you can also right-click `src/test/java` and choose **Run 'All Tests'**.
 
 The tests do not need MySQL. Each test creates its own empty H2 database in memory (in MySQL compatibility mode) from [`src/test/resources/schema.sql`](src/test/resources/schema.sql), so tests never share data and can run in any order.
 
